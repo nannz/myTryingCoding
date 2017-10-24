@@ -1,6 +1,6 @@
 var balls = [];
 var video;
-var vScale = 16;
+var vScale = 32;
 
 var bobs = [];
 var lines = [];
