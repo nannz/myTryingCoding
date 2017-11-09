@@ -10,7 +10,7 @@ class Particle{
     
     size = 2.0;
     mass = 1.0;
-    colour = color(0,0,0,255);//alpha is 255
+    colour = color(0,0,0,150);//alpha is 255
   }
   
   void setPos(float x,float y , float z){
