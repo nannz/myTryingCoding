@@ -1,3 +1,4 @@
+//try exploding in a sin/cos wave
 import java.util.Calendar;
 
 PImage[] images;
@@ -47,7 +48,7 @@ void setup() {
         if (imgPBrightness >= 250) {
           imgPSize = 0;
         } else {
-          imgPSize = map(imgPBrightness, 0, 255, 7.0, 0.0002);
+          imgPSize = map(imgPBrightness, 0, 255, 5.0, 0.0002);
         }
         float imgPPosX =width/2 - imgTemp.width/2 + x;
         float imgPPosY = height/2 - imgTemp.height/2 + y;
@@ -78,6 +79,15 @@ void setup() {
 void draw(){
   background(255);
   for(Particle p: particles){
+    p.update();
     p.display();
+  }
+}
+
+void mouseClicked() {
+  for(Particle p: particles){
+    PVector force = new PVector(random(-10,10),random(-10,10));
+    p.applyForce(force);
+    p.isExploded = true;
   }
 }
