@@ -1,4 +1,6 @@
-//try exploding in a sin/cos wave
+//to the next IMG
+//doesn't work after the second image.
+
 import java.util.Calendar;
 
 PImage[] images;
@@ -7,9 +9,12 @@ int imageCount;
 PImage imgTemp;
 //ImgInfo[] imgInfoTemps = new ImgInfo[1]; //only for one image, all the particles 
 ImgInfo[][] imgsInfos;
+float imgPSize_MAX = 5.0;
 Particle[] particles = new Particle[1];
 
 int RESOLUTION = 6;
+
+boolean allNext = true;
 void setup() {
   //size(1280, 720);
   size(1680, 1050);
@@ -48,7 +53,7 @@ void setup() {
         if (imgPBrightness >= 250) {
           imgPSize = 0;
         } else {
-          imgPSize = map(imgPBrightness, 0, 255, 5.0, 0.0002);
+          imgPSize = map(imgPBrightness, 0, 255, imgPSize_MAX, 0.0002);
         }
         float imgPPosX =width/2 - imgTemp.width/2 + x;
         float imgPPosY = height/2 - imgTemp.height/2 + y;
@@ -65,29 +70,90 @@ void setup() {
     //store this image info into the imgsInfos array
     imgsInfos[i] = imgInfoTemps;
   }
+  
+  //println(imgsInfos[0].length);
+  //println(imgsInfos[1].length);
+  
   //create particles for the first image
-  for(int i = 0; i< imgsInfos[0].length; i++){
-    Particle p = new Particle(imgsInfos[0][i].pos.x, imgsInfos[0][i].pos.y,imgsInfos[0][i].size);
-    if(particles[0] == null){
+  for (int i = 0; i< imgsInfos[0].length; i++) {
+    Particle p = new Particle(imgsInfos[0][i].pos.x, imgsInfos[0][i].pos.y, imgsInfos[0][i].size);
+    p.setImgNo(0);
+    if (particles[0] == null) {
       particles[0] = p;
-    }else{
+    } else {
       particles = (Particle[])append(particles, p);
     }
   }
 }
 
-void draw(){
+void draw() {
   background(255);
-  for(Particle p: particles){
+  for (int i = 0; i < particles.length; i ++) {
+    Particle p = particles[i];
+    
+    //if isNext = true
+    //applyAttraction to the destination position
+    //next image = imgsInfos[p.imageNo +1]
+    if(
+    //p.isExploded == true && 
+    p.isNext == true){
+      ImgInfo nextImg = imgsInfos[p.imageNo+1][i];
+      //p.setImgNo(p.imageNo+1);
+      PVector distance = PVector.sub(nextImg.pos, p.pos);
+      //PVector destDirection = PVector.sub(distance, p.vel);
+      PVector destDirection = PVector.sub(nextImg.pos, p.pos);
+      destDirection.normalize();
+      destDirection = destDirection.mult(distance.mag() * 0.05);
+      p.applyForce(destDirection);
+      //p.applyAttraction(nextImg);
+      
+      p.size = nextImg.size;
+      //check if arrive the destination points
+      if  (p.pos.dist(nextImg.pos)<1){
+        println("particle "+i + ": next arrived!");
+        particles[i] = null;
+        int pImageNo = p.imageNo+1;
+        particles[i] = new Particle(imgsInfos[pImageNo][i].pos.x, imgsInfos[pImageNo][i].pos.y, imgsInfos[pImageNo][i].size);
+        particles[i].imageNo = pImageNo;
+        //p.vel.mult(0);
+        //p.pos = nextImg.pos.copy();
+        //p.isExploded = false;
+        //p.isNext = false;
+        //println("DONE!");
+      }
+    }
     p.update();
     p.display();
+  }
+  
+  //println("imageNo: "+ particles[(int)random(0,particles.length)].imageNo);
+  for (Particle p : particles) {
+    if(p.imageNo == 0){
+      allNext = false;
+    }
+  }
+  if(allNext == true){
+    print("all Next!");
   }
 }
 
 void mouseClicked() {
-  for(Particle p: particles){
-    PVector force = new PVector(random(-20,20),random(-20,20));
+  for (Particle p : particles) {
+    PVector force = new PVector(random(-20, 20), random(-20, 20));
     p.applyForce(force);
     p.isExploded = true;
+  }
+  println("applied!");
+}
+
+void keyPressed() {
+  for (int i = 0; i < particles.length; i ++) {
+    Particle p = particles[i];
+    if (keyPressed && key == CODED) {
+      if (keyCode == RIGHT) {
+        p.isNext = true;
+        //p.isExploded = false;
+      }
+    }
   }
 }

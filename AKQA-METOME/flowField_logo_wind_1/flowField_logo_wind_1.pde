@@ -3,7 +3,7 @@
 
 
 float inc = 0.1;//0.1; 
-int scl = 10; //scale
+int scl = 20; //scale
 int cols, rows;
 
 float zoff = 0; //the time
@@ -87,7 +87,7 @@ void draw() {
 
       PVector flowV = PVector.fromAngle(angle);      
       //control the speed
-      flowV.setMag(0.05);
+      flowV.setMag(0.099);
       flowField[index]=flowV;
       
       /*drawflowField();*/
@@ -108,11 +108,19 @@ void draw() {
   fill(0);
   
   for (int i = 0; i < particles.length; i++) {
-    if(particles[i].pos.y < height/2){
-      wind = new PVector(0,-0.03);
-    }else{
-      wind = new PVector(0,0.03);
-    }
+    PVector direction = PVector.sub(particles[i].pos,new PVector(width/2, height/2));
+    direction.normalize();
+    direction.mult(1);
+
+    wind = PVector.sub(direction, particles[i].vel);
+    wind.mult(0.2);
+    
+    
+    //if(particles[i].pos.y < height/2){
+    //  wind = new PVector(0,-0.03);
+    //}else{
+    //  wind = new PVector(0,0.03);
+    //}
     particles[i].applyForce(wind);
     particles[i].follow(flowField);
     particles[i].update();
