@@ -17,7 +17,7 @@ boolean allNext = true;
 float initialDistance = 0;
 
 PVector wind;
-
+PVector agent;
 void setup() {
   //size(1280, 720);
   size(1680, 1050);
@@ -87,28 +87,27 @@ void setup() {
 }
 
 void draw() {
-  background(255);
-
-  drawAgent();
+  //background(255);
+  fill(255, 40);
+  rect(0, 0, width, height);
+  noFill();
   
-  if (particles[(int)random(0, particles.length-1)].isNext == true) {
-    fill(255, 10);
-    rect(0, 0, width, height);
-    noFill();
-  }
+  agent = drawAgent();
+
+
+
 
   for (int i = 0; i < particles.length; i ++) {
     Particle p = particles[i];
-
+    if (p.isExploded == true) {
+      p.applyAttraction(agent);
+    }
     //if isNext = true
     //applyAttraction to the destination position
     //next image = imgsInfos[p.imageNo +1]
     if (
       //p.isExploded == true && 
       p.isNext == true) {
-
-
-
       ImgInfo nextImg = imgsInfos[p.imageNo+1][i];
 
       /*apply the force towards the destination*/
@@ -121,8 +120,6 @@ void draw() {
 
       /*changing the size*/
       p.size = nextImg.size;
-      //float lerpPercentage = map(distance.mag(), 0, p.initialDistance, 0.0, 1.0);    
-      //p.size = lerp(p.initialSize, nextImg.size,lerpPercentage);     
 
       //check if arrive the destination points
       if  (p.pos.dist(nextImg.pos)<1) {
@@ -131,11 +128,6 @@ void draw() {
         int pImageNo = p.imageNo+1;
         particles[i] = new Particle(imgsInfos[pImageNo][i].pos.x, imgsInfos[pImageNo][i].pos.y, imgsInfos[pImageNo][i].size);
         particles[i].imageNo = pImageNo;
-        //p.vel.mult(0);
-        //p.pos = nextImg.pos.copy();
-        //p.isExploded = false;
-        //p.isNext = false;
-        //println("DONE!");
       }
     }
     p.update();
@@ -145,7 +137,7 @@ void draw() {
 
 void mouseClicked() {
   for (Particle p : particles) {
-    PVector force = new PVector(random(-20, 20), random(-20, 20));
+    PVector force = new PVector(random(-10, 10), random(-10, 10));
     p.applyForce(force);
     p.isExploded = true;
   }
@@ -159,6 +151,7 @@ void keyPressed() {
     if (keyPressed && key == CODED) {
       if (keyCode == RIGHT) {
         p.isNext = true;
+        p.isExploded = false;
         ImgInfo nextImg = imgsInfos[p.imageNo+1][i];
         //record the initial distance to the target point 
         p.initialDistance = PVector.dist(p.pos, nextImg.pos);
@@ -172,22 +165,22 @@ void keyPressed() {
   }
 }
 float t;
-PVector drawAgent(){
+PVector drawAgent() {
   pushMatrix();
   translate(width/2, height/2);
   //float yVal = sin(frameCount * 0.1)*(frameCount*0.1 + width/2);
   //float xVal = cos(frameCount * 0.1)*(frameCount*0.1 + height/2);
   float xVal = sin(t/10)*100 + sin(t/5)*20;
   float yVal = cos(-t/10)* 100 + sin(t/5) *50;
-  fill(255,0,0);
+  fill(255, 0, 0);
   stroke(1);
-  line(0,0,xVal*10,yVal*10);
+  //line(0,0,xVal*10,yVal*10);
   noStroke();
-  ellipse(xVal*10,yVal*10, 10, 10);
+  //ellipse(xVal*10,yVal*10, 10, 10);
   popMatrix();
-  
+
   t+= 0.2;
-  
-  PVector agentPos = new PVector(xVal, yVal);
+
+  PVector agentPos = new PVector(1.2*(xVal+width/2), 1.2*(yVal+height/2));
   return agentPos;
 }

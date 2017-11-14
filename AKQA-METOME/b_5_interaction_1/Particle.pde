@@ -9,7 +9,6 @@ class Particle {
   float initialDistance;
   float initialSize;
   float angle, angleVel;
-  
   Particle(float _x, float _y, float _s) {
     pos = new PVector(_x, _y);
     size = _s;
@@ -42,15 +41,17 @@ class Particle {
   }
 
   void applyAttraction(PVector destination){
-    float distance = pos.dist(destination);
+    PVector distance = PVector.sub(destination,pos);
+    PVector direction = PVector.sub(distance, vel);
     //float destMass = map(destImgP.size, 0, imgPSize_MAX, 2, 0);
-    float destMass = 100;
-    float magnitude = (C_ATTRACTION * mass * destMass)/(distance * distance);
-    PVector force = PVector.sub(destination, this.pos);
-    force.normalize();
-    //force.mult(distance * 0.05);//magnitude);
-    force.mult(magnitude);
-    applyForce(force);
+    //float destMass = 100;
+    //float magnitude = (C_ATTRACTION * mass * destMass)/(distance * distance);
+    //PVector force = PVector.sub(destination, this.pos);
+    //force.normalize();
+    direction.normalize();
+    direction.mult(0.6);//magnitude);
+    //force.mult(magnitude);
+    applyForce(direction);
   }
   
   void applyForce(PVector force) {
@@ -74,7 +75,7 @@ class Particle {
       //rotate(frameCount * this.angleVel + this.angle);
     }
     
-    fill(0);
+    fill(0,100);
     ellipse(0, 0, size, size);
     popMatrix();
   }

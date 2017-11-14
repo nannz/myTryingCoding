@@ -21,6 +21,7 @@ void setup() {
   hint(DISABLE_DEPTH_MASK);
   //loadShape of the logo
   logo = loadShape("logo.svg");
+  //logo = loadShape("akqash.svg");
   children = logo.getChildCount();
 
   println("children number: " + children);

@@ -36,7 +36,7 @@ void draw() {
       PVector v = child.getVertex(j);
       // Cycling brightness for each vertex
       stroke(255-(frameCount + (i+1)*j) % 255);
-      strokeWeight(1.5);
+      strokeWeight(4);
       // Just a dot for each one
       point(v.x, v.y);
     }
