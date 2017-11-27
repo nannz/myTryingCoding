@@ -3,7 +3,7 @@
 
 
 float inc = 0.1;//0.1; 
-int scl = 20; //scale
+int scl = 10; //scale
 int cols, rows;
 
 float zoff = 0; //the time
@@ -15,13 +15,16 @@ int children;
 PVector[] particlePoses;
 int pCount = 0;
 PVector wind;
+int indexCount;//for counting the particles' index in setup
+
 void setup() {
-  size(1680, 1050,P2D);
+  size(1280, 720, P2D);
   background(255);
   hint(DISABLE_DEPTH_MASK);
   //loadShape of the logo
-  logo = loadShape("logo.svg");
-  //logo = loadShape("akqash.svg");
+  //logo = loadShape("logo.svg");
+  //logo = loadShape("../footage_logo/akqash.svg");
+  logo = loadShape("../footage_logo/akqash2.svg");
   children = logo.getChildCount();
 
   println("children number: " + children);
@@ -43,18 +46,9 @@ void setup() {
   particles = new Particle[noOfPoints];
   //iterate the child shapes of the logo
 
-  for (int i = 0; i< logo.getChild(0).getVertexCount(); i++) {
-    PVector v = logo.getChild(0).getVertex(i);
-    v.x += width/2 - logo.width/2;
-    v.y +=  height/2- logo.height/2;
-    particlePoses[i] = v.copy();
-  }
-  for (int i = 0; i< logo.getChild(1).getVertexCount(); i++) {
-    PVector v = logo.getChild(1).getVertex(i);
-    v.x += width/2 - logo.width/2;
-    v.y +=  height/2- logo.height/2;
-    particlePoses[i+logo.getChild(0).getVertexCount()] = v.copy();
-  }
+  createParticlePoses();
+  
+  
 
   for (int i = 0; i < noOfPoints; i++) {
     particles[i] = new Particle();
@@ -69,8 +63,8 @@ void draw() {
   rect(0, 0, width, height);
   noFill();
   //background(255,255,255,5);
+
   
-  shape(logo, width/2 - logo.width/2, height/2- logo.height/2);
   
   float yoff = 0;
   for (int y = 0; y < rows; y++) {
@@ -88,7 +82,7 @@ void draw() {
 
       PVector flowV = PVector.fromAngle(angle);      
       //control the speed
-      flowV.setMag(0.099);
+      flowV.setMag(0.05);
       flowField[index]=flowV;
       
       /*drawflowField();*/
@@ -109,21 +103,13 @@ void draw() {
   fill(0);
   
   for (int i = 0; i < particles.length; i++) {
-    PVector direction = PVector.sub(particles[i].pos,new PVector(width/2, height/2));
-    direction.normalize();
-    direction.mult(1);
-
-    wind = PVector.sub(direction, particles[i].vel);
-    wind.mult(0.2);
-    
-    
-    //if(particles[i].pos.y < height/2){
-    //  wind = new PVector(0,-0.03);
-    //}else{
-    //  wind = new PVector(0,0.03);
-    //}
+    if(particles[i].pos.y < height/2){
+      wind = new PVector(0,-0.03);
+    }else{
+      wind = new PVector(0,0.03);
+    }
     particles[i].applyForce(wind);
-    //particles[i].follow(flowField);
+    particles[i].follow(flowField);
     particles[i].update();
     particles[i].edges();
     
@@ -134,6 +120,13 @@ void draw() {
     }
     particles[i].display();
   }
+  
+  logo.disableStyle();
+  //stroke(0);
+  //strokeWeight(1);
+  fill(0);
+  shape(logo, width/2 - logo.width/2, height/2- logo.height/2);
+  noStroke();
 
 }
 

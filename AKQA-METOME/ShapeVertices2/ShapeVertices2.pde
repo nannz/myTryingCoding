@@ -16,7 +16,8 @@ PShape logo;
 void setup() {
   size(1280, 720);
   // Load the shape
-  logo = loadShape("logo.svg");
+  //logo = loadShape("logo.svg");
+  logo = loadShape("../footage_logo/akqash2.svg");
   println(logo.getChildCount());
 }
 

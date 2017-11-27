@@ -1,9 +1,5 @@
-/*get another layer of wind force.*/
-/*if edge, splice and create a new one*/
-
-
-float inc = 0.1;//0.1; 
-int scl = 20; //scale
+float inc = 0.1; 
+int scl = 10; //scale
 int cols, rows;
 
 float zoff = 0; //the time
@@ -14,14 +10,26 @@ PShape logo;
 int children;
 PVector[] particlePoses;
 int pCount = 0;
-PVector wind;
+
+import controlP5.*;
+ControlFrame cf;
+float rad = 1.0;
+boolean recording = false;
+
+void settings(){
+  size(1680, 1050, P2D);
+}
 void setup() {
-  size(1680, 1050,P2D);
+  //set up the control P5 panel
+  cf = new ControlFrame(this, 400, 400, "Controls");
+  surface.setLocation(420, 10);
+  noStroke();
+  
+  //size(1680, 1050,P2D);
   background(255);
   hint(DISABLE_DEPTH_MASK);
   //loadShape of the logo
-  logo = loadShape("logo.svg");
-  //logo = loadShape("akqash.svg");
+  logo = loadShape("../footage_logo/akqash2.svg");
   children = logo.getChildCount();
 
   println("children number: " + children);
@@ -42,35 +50,21 @@ void setup() {
   particlePoses = new PVector[noOfPoints];
   particles = new Particle[noOfPoints];
   //iterate the child shapes of the logo
+  
+  createParticlePoses();
 
-  for (int i = 0; i< logo.getChild(0).getVertexCount(); i++) {
-    PVector v = logo.getChild(0).getVertex(i);
-    v.x += width/2 - logo.width/2;
-    v.y +=  height/2- logo.height/2;
-    particlePoses[i] = v.copy();
-  }
-  for (int i = 0; i< logo.getChild(1).getVertexCount(); i++) {
-    PVector v = logo.getChild(1).getVertex(i);
-    v.x += width/2 - logo.width/2;
-    v.y +=  height/2- logo.height/2;
-    particlePoses[i+logo.getChild(0).getVertexCount()] = v.copy();
-  }
 
   for (int i = 0; i < noOfPoints; i++) {
     particles[i] = new Particle();
     particles[i].pos = particlePoses[i].copy();
   }
-  
-  noStroke();
 }
 
 void draw() {
-  fill(255, 10);
+  fill(255, 20);
   rect(0, 0, width, height);
   noFill();
   //background(255,255,255,5);
-  
-  shape(logo, width/2 - logo.width/2, height/2- logo.height/2);
   
   float yoff = 0;
   for (int y = 0; y < rows; y++) {
@@ -82,25 +76,26 @@ void draw() {
        float angle = noise(xoff, yoff, zoff) * PI/2;
        angle = calAngle1(x, y, angle);
        */
-      //way1 and 2 to calculate the angle
+      //way2 to calculate the angle
       float angle = noise(xoff, yoff, zoff) * TWO_PI;
-      angle = calAngle1(x, y, angle);
+      //angle = calAngle2(x, y, angle);
 
       PVector flowV = PVector.fromAngle(angle);      
       //control the speed
-      flowV.setMag(0.099);
+      flowV.setMag(0.05);
+
       flowField[index]=flowV;
-      
-      /*drawflowField();*/
+
+      //drawflowField();
       pushMatrix();
-      stroke(0.10);
+      //stroke(0.10);
       translate(x*scl, y*scl);
       //rotate(flowV.heading());
       //line(0, 0, scl, 0);
       //fill(255,0,0);
       //ellipse(0,0,3,3);
       popMatrix();
-      //noStroke();
+
       xoff += inc;
     }
     yoff += inc;
@@ -109,41 +104,28 @@ void draw() {
   fill(0);
   
   for (int i = 0; i < particles.length; i++) {
-    PVector direction = PVector.sub(particles[i].pos,new PVector(width/2, height/2));
-    direction.normalize();
-    direction.mult(1);
-
-    wind = PVector.sub(direction, particles[i].vel);
-    wind.mult(0.2);
-    
-    
-    //if(particles[i].pos.y < height/2){
-    //  wind = new PVector(0,-0.03);
-    //}else{
-    //  wind = new PVector(0,0.03);
-    //}
-    particles[i].applyForce(wind);
-    //particles[i].follow(flowField);
+    particles[i].setRad(rad);
+    particles[i].follow(flowField);
     particles[i].update();
     particles[i].edges();
-    
-    if(particles[i].isEdged == true){
-      particles[i].pos = particlePoses[i].copy(); //鼠标不能多点，没有同步。
-      particles[i].vel = new PVector(0,0);
-      particles[i].isEdged = false;
-    }
     particles[i].display();
   }
-
+  
+  logo.disableStyle();
+  //stroke(0);
+  //strokeWeight(1);
+  fill(0);
+  shape(logo, width/2 - logo.width/2, height/2- logo.height/2);
+  noStroke();
+  
+  
+  if(recording == true){
+    saveFrame("output/frame_####.tif");
+  }
 }
 
 
 float calAngle1(int x, int y, float angle) {
-  
-  if(x > floor(cols/2)){
-    angle = PI - angle;
-  }
-  /*
   if (x<= floor(cols/2) && y <= floor(rows/2)) {//左上
     angle = angle + PI;
   } else if ( x > floor(cols/2) && y <= floor(rows/2)) {//右上
@@ -153,7 +135,6 @@ float calAngle1(int x, int y, float angle) {
   } else if (x > floor(cols/2) && y > floor(rows/2)) {//右下
     angle = angle;
   } 
-  */
   return angle;
 }
 

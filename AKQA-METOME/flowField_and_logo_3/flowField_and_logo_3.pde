@@ -23,7 +23,8 @@ void setup() {
   hint(DISABLE_DEPTH_MASK);
   //loadShape of the logo
   //logo = loadShape("logo.svg");
-  logo = loadShape("../footage_logo/akqash.svg");
+  //logo = loadShape("../footage_logo/akqash.svg");
+  logo = loadShape("../footage_logo/akqash2.svg");
   children = logo.getChildCount();
 
   println("children number: " + children);
@@ -121,9 +122,9 @@ void draw() {
   }
   
   logo.disableStyle();
-  stroke(0);
-  strokeWeight(1);
-  fill(255);
+  //stroke(0);
+  //strokeWeight(1);
+  fill(0);
   shape(logo, width/2 - logo.width/2, height/2- logo.height/2);
   noStroke();
 
@@ -165,10 +166,10 @@ float calAngle2(int x, int y, float angle) {
 }
 
 void mouseClicked(){
-  for(int i = 0; i < pCount; i++){
-    Particle p = new Particle();
-    p.pos = particlePoses[i].copy();
-    particles = (Particle[])append(particles,p);
-  }
+  //for(int i = 0; i < pCount; i++){
+  //  Particle p = new Particle();
+  //  p.pos = particlePoses[i].copy();
+  //  particles = (Particle[])append(particles,p);
+  //}
 
 }
